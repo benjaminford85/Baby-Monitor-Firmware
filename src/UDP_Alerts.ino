@@ -1,10 +1,9 @@
 // External dependencies
-extern WiFiUDP udp;
 extern void handleCryStart(); 
 extern void handleCryEnd(); 
 
 const uint16_t UDP_PORT_LISTEN = 42100;
-WiFiUDP udp;
+WiFiUDP udp; // Definition of the global UDP object
 
 void udpBegin() {
   udp.begin(UDP_PORT_LISTEN);
