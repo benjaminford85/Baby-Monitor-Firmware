@@ -40,7 +40,7 @@ std::vector<ScanItem> doScan(uint32_t durationMs) {
   scan->setInterval(45); // ms
   scan->setWindow(30);  // ms
   
-  scan->setDuplicateFilter(false); // Use false for maximum discovery/debugging
+  scan->setDuplicateFilter(true); // NEW: Use true to reduce clutter and stabilize list
 
   scanInProgress = true;
   Serial.printf("BLE scan starting for %u ms...\n", durationMs); 
@@ -62,6 +62,12 @@ std::vector<ScanItem> doScan(uint32_t durationMs) {
     const char* nm = d->haveName() ? d->getName().c_str() : "";
     bool hasCust = d->haveServiceUUID() && d->isAdvertisingService(UUID_CUSTOM_SVC);
 
+String nameStr = String(nm);
+// NEW: Filter for devices that start with "BabyWatch_"
+if (!nameStr.startsWith("BabyWatch_") && !hasCust) {
+    continue; // Skip non-wearable devices
+}
+
     // VITAL DEBUGGING OUTPUT: Print EVERYTHING found
     Serial.printf("ADV %02d: %s  RSSI=%d  Name=%s  Svc=%s\n",
                   i,
@@ -71,7 +77,7 @@ std::vector<ScanItem> doScan(uint32_t durationMs) {
                   hasCust ? "custom90ab" : "-");
 
     ScanItem item;
-    item.name = (nm && *nm) ? String(nm) : String("");
+    item.name = nameStr;
     item.mac = mac;
     item.rssi = rssi;
     item.hasCustomService = hasCust;
